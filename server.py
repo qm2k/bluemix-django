@@ -1,21 +1,16 @@
+#!/usr/bin/env python
 import os
-try:
-  from SimpleHTTPServer import SimpleHTTPRequestHandler as Handler
-  from SocketServer import TCPServer as Server
-except ImportError:
-  from http.server import SimpleHTTPRequestHandler as Handler
-  from http.server import HTTPServer as Server
+import sys
 
-# Read port selected by the cloud for our application
-PORT = int(os.getenv('VCAP_APP_PORT', 8000))
-# Change current directory to avoid exposure of control files
-os.chdir('static')
+if __name__ == "__main__":
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 
-httpd = Server(("", PORT), Handler)
-try:
-  print("Start serving at port %i" % PORT)
-  httpd.serve_forever()
-except KeyboardInterrupt:
-  pass
-httpd.server_close()
+    # Read port selected by the cloud for our application
+    PORT = int(os.getenv('VCAP_APP_PORT', 8000))
+    ARGS = sys.argv
+    ARGS[1:1] = ['runserver', '--noreload', '0.0.0.0:' + str(PORT)]
+
+    from django.core.management import execute_from_command_line
+
+    execute_from_command_line(ARGS)
 
